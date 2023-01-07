@@ -13,13 +13,13 @@ const COMPOUND_STRATAGIES = {
 
 const getDateAfterSomeDays = (initialDate, days) => new Date(initialDate.getTime() + days*24*60*60*1000);
 
-export const getRoiValueAfterCompounding = (params:RoiParams): Promise<RoiRes> => {
+export const getRoiValueAfterCompounding = async (params:RoiParams): Promise<RoiRes> => {
     const {initialCapitalValue, periodicInvestmentValue, timeForCompounding, rateForCompounding, periodForCompounding} = params;
     const startingDate = new Date();
     let lastRecordedDate = startingDate;
     let currentInvestmentValue = initialCapitalValue;
     let totalInvestmentValueAfterCompounding:number = 0;
-    const investmentValueAfterEachPeriod: any = [];
+    const investmentValueAfterEachPeriod: Array<{date:string, value:number}> = [];
     for(let count = 0; count < timeForCompounding; count++){
         let newInvestmentValue = currentInvestmentValue*(rateForCompounding/100) + periodicInvestmentValue;
         currentInvestmentValue = newInvestmentValue;
@@ -27,7 +27,7 @@ export const getRoiValueAfterCompounding = (params:RoiParams): Promise<RoiRes> =
         const month = lastRecordedDate.getMonth()+1;
         lastRecordedDate = getDateAfterSomeDays(lastRecordedDate, COMPOUND_STRATAGIES[periodForCompounding](year, month));
         investmentValueAfterEachPeriod.push({
-            date: getDateAfterSomeDays(lastRecordedDate, COMPOUND_STRATAGIES[periodForCompounding]()),
+            date: lastRecordedDate.toString(),
             value: currentInvestmentValue
         });
     }
